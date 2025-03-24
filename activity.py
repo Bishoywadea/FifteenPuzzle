@@ -1,31 +1,47 @@
 import gi
-gi.require_version('Gtk', '3.0')
+
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
+import pygame
 
-from gettext import gettext as _
-
-from sugar3.activity import activity
+from sugar3.activity.activity import Activity
 from sugar3.graphics.toolbarbox import ToolbarBox
-from sugar3.activity.widgets import StopButton
 from sugar3.activity.widgets import ActivityToolbarButton
+from sugar3.activity.widgets import StopButton
 
 
-class FifteenPuzzle(activity.Activity):
-    """HelloWorldActivity class as specified in activity.info"""
+import sugargame.canvas
 
+import main
+
+
+class FifteenPuzzle(Activity):
     def __init__(self, handle):
-        """Set up the HelloWorld activity."""
-        activity.Activity.__init__(self, handle)
+        Activity.__init__(self, handle)
 
-        # we do not have collaboration features
-        # make the share option insensitive
-        self.max_participants = 1
+        self.build_toolbar()
+        self.game = main.Main(journal=True)
 
-        # toolbar with the new toolbar redesign
+        # Build the Pygame canvas and start the game running
+        # (self.game.run is called when the activity constructor
+        # returns).
+        self._pygamecanvas = sugargame.canvas.PygameCanvas(
+            self, main=self.game.run, modules=[pygame.display]
+        )
+        self.game.set_canvas(self._pygamecanvas)
+
+        # Note that set_canvas implicitly calls read_file when
+        # resuming from the Journal.
+        self.set_canvas(self._pygamecanvas)
+        self._pygamecanvas.grab_focus()
+
+    def build_toolbar(self):
         toolbar_box = ToolbarBox()
+        self.set_toolbar_box(toolbar_box)
+        toolbar_box.show()
 
         activity_button = ActivityToolbarButton(self)
-        toolbar_box.toolbar.insert(activity_button, 0)
+        toolbar_box.toolbar.insert(activity_button, -1)
         activity_button.show()
 
         separator = Gtk.SeparatorToolItem()
@@ -37,11 +53,13 @@ class FifteenPuzzle(activity.Activity):
         stop_button = StopButton(self)
         toolbar_box.toolbar.insert(stop_button, -1)
         stop_button.show()
+        self.show_all()
 
-        self.set_toolbar_box(toolbar_box)
-        toolbar_box.show()
+    def read_file(self, file_path):
+        self.game.read_file(file_path)
 
-        # label with the text, make the string translatable
-        label = Gtk.Label(_("Hello ooWorld!"))
-        self.set_canvas(label)
-        label.show()
+    def write_file(self, file_path):
+        self.game.write_file(file_path)
+
+    def close(self):
+        self.game.quit()
