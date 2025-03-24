@@ -1,0 +1,176 @@
+import pygame as pg
+import random
+
+class Board:
+    def __init__(self, main, center, tile_size=100):
+        self.main = main
+        self.center = center
+        self.tile_size = tile_size
+        self.board_size = 4 * tile_size
+        
+        self.top_left = (
+            center[0] - self.board_size // 2,
+            center[1] - self.board_size // 2
+        )
+        
+        self.grid = self.create_solvable_grid()
+        self.empty_pos = self.find_empty_position()
+        
+        self.tiles = []
+        self.setup_tiles()
+
+    def create_solvable_grid(self):
+        grid = [[1, 2, 3, 4],
+                [5, 6, 7, 8],
+                [9, 10, 11, 12],
+                [13, 14, 15, 0]]
+        
+        empty_row, empty_col = 3, 3
+        moves = 0
+        while moves < 200:
+            directions = []
+            if empty_row > 0:
+                directions.append(0)
+            if empty_col < 3:
+                directions.append(1)
+            if empty_row < 3:
+                directions.append(2)
+            if empty_col > 0:
+                directions.append(3)
+                
+            direction = random.choice(directions)
+            
+            if direction == 0:
+                grid[empty_row][empty_col] = grid[empty_row-1][empty_col]
+                grid[empty_row-1][empty_col] = 0
+                empty_row -= 1
+            elif direction == 1:
+                grid[empty_row][empty_col] = grid[empty_row][empty_col+1]
+                grid[empty_row][empty_col+1] = 0
+                empty_col += 1
+            elif direction == 2:
+                grid[empty_row][empty_col] = grid[empty_row+1][empty_col]
+                grid[empty_row+1][empty_col] = 0
+                empty_row += 1
+            elif direction == 3:
+                grid[empty_row][empty_col] = grid[empty_row][empty_col-1]
+                grid[empty_row][empty_col-1] = 0
+                empty_col -= 1
+                
+            moves += 1
+            
+        return grid
+
+    def find_empty_position(self):
+        for row in range(4):
+            for col in range(4):
+                if self.grid[row][col] == 0:
+                    return (row, col)
+        return (3, 3)
+
+    def setup_tiles(self):
+        self.tiles = []
+        for row in range(4):
+            tile_row = []
+            for col in range(4):
+                value = self.grid[row][col]
+                if value > 0:
+                    tile_x = self.top_left[0] + col * self.tile_size
+                    tile_y = self.top_left[1] + row * self.tile_size
+                    tile = Tile(self.main, (tile_x, tile_y), value, self.tile_size)
+                    tile_row.append(tile)
+                else:
+                    tile_row.append(None)
+            self.tiles.append(tile_row)
+
+    def is_valid_move(self, row, col):
+        empty_row, empty_col = self.empty_pos
+        return (abs(row - empty_row) == 1 and col == empty_col) or \
+               (abs(col - empty_col) == 1 and row == empty_row)
+
+    def move_tile(self, row, col):
+        if not self.is_valid_move(row, col):
+            return False
+            
+        empty_row, empty_col = self.empty_pos
+        
+        self.grid[empty_row][empty_col] = self.grid[row][col]
+        self.grid[row][col] = 0
+        
+        self.empty_pos = (row, col)
+        
+        tile = self.tiles[row][col]
+        self.tiles[empty_row][empty_col] = tile
+        self.tiles[row][col] = None
+        
+        new_x = self.top_left[0] + empty_col * self.tile_size
+        new_y = self.top_left[1] + empty_row * self.tile_size
+        tile.set_position((new_x, new_y))
+        
+        if self.is_solved():
+            self.main.solved = True
+            
+        return True
+
+    def is_solved(self):
+        expect = 1
+        for row in range(4):
+            for col in range(4):
+                if row == 3 and col == 3:
+                    if self.grid[row][col] != 0:
+                        return False
+                else:
+                    if self.grid[row][col] != expect:
+                        return False
+                    expect += 1
+        return True
+
+    def handle_click(self, pos):
+        for row in range(4):
+            for col in range(4):
+                if self.grid[row][col] == 0:
+                    continue
+                    
+                tile_x = self.top_left[0] + col * self.tile_size
+                tile_y = self.top_left[1] + row * self.tile_size
+                tile_rect = pg.Rect(tile_x, tile_y, self.tile_size, self.tile_size)
+                
+                if tile_rect.collidepoint(pos):
+                    return self.move_tile(row, col)
+                    
+        return False
+
+    def draw(self):
+        pg.draw.rect(pg.display.get_surface(), (255, 255, 255), 
+                    (self.top_left[0], self.top_left[1], self.board_size, self.board_size), 2)
+        for row in self.tiles:
+            for tile in row:
+                if tile:
+                    tile.draw()
+
+class Tile:
+    def __init__(self, main, position, value, size):
+        self.main = main
+        self.position = position
+        self.value = value
+        self.size = size
+        self.font = pg.font.Font(None, size // 2)
+        self.text = self.font.render(str(value), True, (255, 255, 255))
+        self.text_pos = (
+            position[0] + (size - self.text.get_width()) // 2,
+            position[1] + (size - self.text.get_height()) // 2
+        )
+    
+    def set_position(self, new_position):
+        self.position = new_position
+        self.text_pos = (
+            new_position[0] + (self.size - self.text.get_width()) // 2,
+            new_position[1] + (self.size - self.text.get_height()) // 2
+        )
+    
+    def draw(self):
+        pg.draw.rect(pg.display.get_surface(), (128, 128, 128),
+                    (self.position[0], self.position[1], self.size, self.size))
+        pg.draw.rect(pg.display.get_surface(), (255, 255, 255),
+                    (self.position[0], self.position[1], self.size, self.size), 2)
+        pg.display.get_surface().blit(self.text, self.text_pos)
