@@ -32,6 +32,20 @@ class Main:
     def quit(self):
         self.running = False
 
+    def check_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.running = False
+            if event.type == pg.VIDEORESIZE:
+                pg.display.set_mode(event.size, pg.RESIZABLE)
+                break
+            if event.type == pg.MOUSEBUTTONUP:
+                if self.help_pos.collidepoint(pg.mouse.get_pos()):
+                    self.show_help = not self.show_help
+                if self.show_help:
+                    break
+                
+
     def draw_help(self):
         # Draw the help button
         pg.draw.circle(
@@ -107,6 +121,7 @@ class Main:
         self.board.draw()
         self.draw_help()
 
+
         pg.display.update()
 
     def reset_game(self):
@@ -125,13 +140,27 @@ class Main:
         if self.canvas is not None:
             self.canvas.grab_focus()
         
+        self.question_text = pg.font.Font(None, 72).render("?", True, config.WHITE)
+        self.close_text = pg.font.Font(None, 64).render("X", True, config.WHITE)
+        self.help_text = [
+            pg.font.Font(None, 36).render(
+                i,
+                True,
+                config.WHITE,
+            )
+            for i in (
+                _("Slide the numbered tiles to arrange them in order."),
+                _("Click a tile adjacent to the empty space to move it."),
+                _("The goal is to arrange the tiles from 1 to 15 with"),
+                _("the empty space in the bottom right corner."),
+            )
+        ]
         self.help_pos = pg.Rect(
             (3 * config.WIDTH + config.BOARD_SIZE) // 4 - 40,
             (config.HEIGHT * 0.5 - config.BOARD_SIZE // 2) // 2 - 40,
             80,
             80,
         )
-        self.question_text = pg.font.Font(None, 72).render("?", True, config.WHITE)
 
 
         self.reset_game()
