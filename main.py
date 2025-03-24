@@ -32,10 +32,81 @@ class Main:
     def quit(self):
         self.running = False
 
+    def draw_help(self):
+        # Draw the help button
+        pg.draw.circle(
+            config.WIN,
+            config.GREY,
+            self.help_pos.center,
+            40,
+        )
+        
+        if self.show_help:
+            # Draw the X button to close help
+            width = self.close_text.get_width()
+            height = self.close_text.get_height()
+            close_rect = (
+                self.help_pos.centerx - width // 2,
+                self.help_pos.centery - height // 2
+            )
+            config.WIN.blit(
+                self.close_text, close_rect
+            )
+            
+            # Calculate the dimensions for help panel based on text content
+            max_text_width = max(text.get_width() for text in self.help_text)
+            total_text_height = sum(text.get_height() for text in self.help_text)
+            spacing = 40  # Space between lines
+            
+            # Calculate padding
+            horizontal_padding = 50
+            vertical_padding = 60
+            
+            # Calculate help panel dimensions
+            help_width = max_text_width + (horizontal_padding * 2)
+            help_height = total_text_height + ((len(self.help_text) - 1) * spacing) + (vertical_padding * 2)
+            
+            # Center the help panel
+            help_x = (config.WIDTH - help_width) // 2
+            help_y = (config.HEIGHT - help_height) // 2
+            
+            # Draw the help panel background
+            pg.draw.rect(
+                config.WIN,
+                config.GREY,
+                pg.Rect(
+                    help_x,
+                    help_y,
+                    help_width,
+                    help_height,
+                ),
+                border_radius=15  # Optional: rounded corners
+            )
+            
+            # Draw each line of help text
+            y_offset = help_y + vertical_padding
+            for text in self.help_text:
+                text_x = (config.WIDTH - text.get_width()) // 2
+                config.WIN.blit(text, (text_x, y_offset))
+                y_offset += text.get_height() + spacing
+                
+        else:
+            # Draw the question mark CENTERED ON the help button
+            q_width = self.question_text.get_width()
+            q_height = self.question_text.get_height()
+            
+            # Calculate position to center the question mark on the help button
+            q_x = self.help_pos.centerx - q_width // 2
+            q_y = self.help_pos.centery - q_height // 2
+            
+            config.WIN.blit(self.question_text, (q_x, q_y))
+        
     def draw(self):
         config.WIN.fill(config.BLACK)
         # Draw the board
         self.board.draw()
+        self.draw_help()
+
         pg.display.update()
 
     def reset_game(self):
@@ -53,6 +124,15 @@ class Main:
         pg.font.init()
         if self.canvas is not None:
             self.canvas.grab_focus()
+        
+        self.help_pos = pg.Rect(
+            (3 * config.WIDTH + config.BOARD_SIZE) // 4 - 40,
+            (config.HEIGHT * 0.5 - config.BOARD_SIZE // 2) // 2 - 40,
+            80,
+            80,
+        )
+        self.question_text = pg.font.Font(None, 72).render("?", True, config.WHITE)
+
 
         self.reset_game()
         while self.running:
