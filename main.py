@@ -117,6 +117,27 @@ class Main:
         
     def draw(self):
         config.WIN.fill(config.BLACK)
+
+        heading_w = self.heading.get_width()
+        heading_h = self.heading.get_height()
+        heading_rect = (
+            (config.WIDTH - heading_w) // 2,
+            (config.HEIGHT * 0.5 - config.BOARD_SIZE // 2 - heading_h) // 2,
+        )
+        config.WIN.blit(
+            self.heading, heading_rect
+        )
+
+        # Draw move counter
+        moves_text = self.font.render(_("Moves: ") + str(self.moves), True, config.WHITE)
+        config.WIN.blit(
+            moves_text,
+            (
+                (config.WIDTH - config.BOARD_SIZE) // 4,
+                config.HEIGHT // 2 - config.BOARD_SIZE // 4,
+            ),
+        )
+
         # Draw the board
         self.board.draw()
         self.draw_help()
@@ -140,6 +161,18 @@ class Main:
         if self.canvas is not None:
             self.canvas.grab_focus()
         
+        self.heading = pg.font.Font(None, 96).render(
+            _("15 Puzzle"),
+            True,
+            config.WHITE
+        )
+        self.reset_text = pg.font.Font(None, 56).render(
+            _("New Game"),
+            True,
+            config.WHITE
+        )
+        self.font = pg.font.Font(None, 72)
+
         self.question_text = pg.font.Font(None, 72).render("?", True, config.WHITE)
         self.close_text = pg.font.Font(None, 64).render("X", True, config.WHITE)
         self.help_text = [
