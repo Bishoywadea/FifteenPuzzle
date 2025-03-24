@@ -44,6 +44,15 @@ class Main:
                     self.show_help = not self.show_help
                 if self.show_help:
                     break
+                if self.canvas is not None:
+                    self.canvas.grab_focus()
+                if not self.solved and self.board.handle_click(pg.mouse.get_pos()):
+                    self.moves += 1
+                if self.reset_rect.collidepoint(pg.mouse.get_pos()):
+                    self.reset_game()
+                # Check for fancy button click when puzzle is solved
+                if self.solved and self.fancy_button_rect.collidepoint(pg.mouse.get_pos()):
+                    self.reset_game()
                 
 
     def draw_help(self):
@@ -117,7 +126,6 @@ class Main:
         
     def draw(self):
         config.WIN.fill(config.BLACK)
-
         heading_w = self.heading.get_width()
         heading_h = self.heading.get_height()
         heading_rect = (
@@ -127,7 +135,7 @@ class Main:
         config.WIN.blit(
             self.heading, heading_rect
         )
-
+        
         # Draw move counter
         moves_text = self.font.render(_("Moves: ") + str(self.moves), True, config.WHITE)
         config.WIN.blit(
@@ -140,9 +148,63 @@ class Main:
 
         # Draw the board
         self.board.draw()
+        
+        # Draw help button
         self.draw_help()
-
-
+        
+        # If puzzle is not solved, draw regular reset button
+        if not self.solved:
+            pg.draw.rect(config.WIN, config.GREY, self.reset_rect)
+            pg.draw.circle(
+                config.WIN,
+                config.GREY,
+                (int(self.reset_rect.x), int(self.reset_rect.centery)),
+                self.reset_rect.height // 2,
+            )
+            pg.draw.circle(
+                config.WIN,
+                config.GREY,
+                (int(self.reset_rect.right), int(self.reset_rect.centery)),
+                self.reset_rect.height // 2,
+            )
+            config.WIN.blit(
+                self.reset_text,
+                (
+                    config.WIDTH / 2 - self.reset_text.get_width() / 2,
+                    config.HEIGHT - self.reset_text.get_height() - 70,
+                ),
+            )
+        
+        # If puzzle is solved, show congratulations and fancy button
+        if self.solved:
+            # Create a semi-transparent overlay
+            overlay = pg.Surface((config.WIDTH, config.HEIGHT), pg.SRCALPHA)
+            overlay.fill((0, 0, 0, 128))
+            config.WIN.blit(overlay, (0, 0))
+            
+            # Draw congratulations text
+            congrats_text = self.congratulation_font.render(_("Puzzle Solved!"), True, config.ORANGE)
+            moves_info = self.font.render(_("Completed in ") + str(self.moves) + _(" moves!"), True, config.WHITE)
+            
+            config.WIN.blit(
+                congrats_text,
+                (
+                    config.WIDTH // 2 - congrats_text.get_width() // 2,
+                    config.HEIGHT // 2 - congrats_text.get_height() - 100,
+                ),
+            )
+            
+            config.WIN.blit(
+                moves_info,
+                (
+                    config.WIDTH // 2 - moves_info.get_width() // 2,
+                    config.HEIGHT // 2 - moves_info.get_height(),
+                ),
+            )
+            
+            # Draw the fancy button
+            self.draw_fancy_button()
+            
         pg.display.update()
 
     def reset_game(self):
@@ -158,9 +220,6 @@ class Main:
                 break
         config.init()
         pg.font.init()
-        if self.canvas is not None:
-            self.canvas.grab_focus()
-        
         self.heading = pg.font.Font(None, 96).render(
             _("15 Puzzle"),
             True,
@@ -171,8 +230,6 @@ class Main:
             True,
             config.WHITE
         )
-        self.font = pg.font.Font(None, 72)
-
         self.question_text = pg.font.Font(None, 72).render("?", True, config.WHITE)
         self.close_text = pg.font.Font(None, 64).render("X", True, config.WHITE)
         self.help_text = [
@@ -194,16 +251,31 @@ class Main:
             80,
             80,
         )
+        self.reset_rect = pg.Rect(
+            config.WIDTH / 2 - self.reset_text.get_width() / 2,
+            config.HEIGHT - self.reset_text.get_height() - 80,
+            self.reset_text.get_width(),
+            self.reset_text.get_height() + 20,
+        )
+        self.font = pg.font.Font(None, 72)
+        self.fancy_font = pg.font.Font(None, 64)
+        self.congratulation_font = pg.font.Font(None, 120)
+        self.fancy_button_rect = pg.Rect(0, 0, 0, 0)  # Initialize with dummy values
 
+        if self.canvas is not None:
+            self.canvas.grab_focus()
 
         self.reset_game()
+        self.clock = pg.time.Clock()
         while self.running:
             if self.journal:
                 # Pump GTK messages.
                 while Gtk.events_pending():
                     Gtk.main_iteration()
 
+            self.check_events()
             self.draw()
+            self.clock.tick(config.FPS)
         pg.display.quit()
         pg.quit()
         sys.exit(0)
