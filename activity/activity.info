@@ -1,0 +1,8 @@
+[Activity]
+name = FifteenPuzzle
+activity_version = 3
+bundle_id = org.sugarlabs.FifteenPuzzle
+exec = sugar-activity3 activity.FifteenPuzzle
+icon = puzzle
+license = GPLv3+
+repository = https://github.com/Bishoywadea/FifteenPuzzle
