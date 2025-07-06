@@ -8,8 +8,9 @@ from sugar3.activity.activity import Activity
 from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.activity.widgets import ActivityToolbarButton
 from sugar3.activity.widgets import StopButton
+from sugar3.graphics.toolbutton import ToolButton
 
-
+from gettext import gettext as _
 import sugargame.canvas
 
 import main
@@ -44,6 +45,12 @@ class FifteenPuzzle(Activity):
         toolbar_box.toolbar.insert(activity_button, -1)
         activity_button.show()
 
+        self.help_button = ToolButton("toolbar-help")
+        self.help_button.set_tooltip(_("Help"))
+        self.help_button.connect("clicked", self._help_cb)
+        toolbar_box.toolbar.insert(self.help_button, -1)
+        self.help_button.show()
+
         separator = Gtk.SeparatorToolItem()
         separator.props.draw = False
         separator.set_expand(True)
@@ -54,6 +61,10 @@ class FifteenPuzzle(Activity):
         toolbar_box.toolbar.insert(stop_button, -1)
         stop_button.show()
         self.show_all()
+
+    def _help_cb(self, button):
+        """Handle help button"""
+        self.game.toggle_help()
 
     def read_file(self, file_path):
         self.game.read_file(file_path)
