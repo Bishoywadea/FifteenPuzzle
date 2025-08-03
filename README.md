@@ -7,19 +7,17 @@ The 15 Puzzle is a classic sliding puzzle that consists of a 4x4 grid with 15 nu
 
 ## How to Play
 
-1. **Starting the Game:**
-   - Launch the 15 Puzzle game application.&#8203;:contentReference[oaicite:0]{index=0}
-   - :contentReference[oaicite:1]{index=1}&#8203;:contentReference[oaicite:2]{index=2}
+### Starting the Game:
+Launch the 15 Puzzle game application.
 
-2. **Objective:**
-   - :contentReference[oaicite:3]{index=3}&#8203;:contentReference[oaicite:4]{index=4}
+### Objective:
+Arrange the numbered tiles in order (1–15), using the empty space to slide tiles.
 
-3. **Controls:**
-   - :contentReference[oaicite:5]{index=5}&#8203;:contentReference[oaicite:6]{index=6}
-   - :contentReference[oaicite:7]{index=7}&#8203;:contentReference[oaicite:8]{index=8}
+### Controls:
+Click or tap a tile adjacent to the empty space to slide it.
 
-4. **Winning the Game:**
-   - :contentReference[oaicite:9]{index=9}&#8203;:contentReference[oaicite:10]{index=10}
+### Winning the Game:
+You win when all tiles are in order from 1 to 15, left to right, top to bottom, with the empty space in the bottom-right corner.
 
 How to use?
 ===========
