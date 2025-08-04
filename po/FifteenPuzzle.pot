@@ -1,0 +1,66 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-04 08:38-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: activity/activity.info:2
+msgid "FifteenPuzzle"
+msgstr ""
+
+#: activity.py:49
+msgid "Help"
+msgstr ""
+
+#: main.py:31 main.py:201
+msgid "15 Puzzle"
+msgstr ""
+
+#: main.py:113
+msgid "Moves: "
+msgstr ""
+
+#: main.py:161
+msgid "Puzzle Solved!"
+msgstr ""
+
+#: main.py:164
+msgid "Completed in "
+msgstr ""
+
+#: main.py:164
+msgid " moves!"
+msgstr ""
+
+#: main.py:203
+msgid "New Game"
+msgstr ""
+
+#: main.py:214
+msgid "Slide the numbered tiles to arrange them in order."
+msgstr ""
+
+#: main.py:215
+msgid "Click a tile adjacent to the empty space to move it."
+msgstr ""
+
+#: main.py:216
+msgid "The goal is to arrange the tiles from 1 to 15 with"
+msgstr ""
+
+#: main.py:217
+msgid "the empty space in the bottom right corner."
+msgstr ""
