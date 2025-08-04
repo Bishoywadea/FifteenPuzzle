@@ -1,6 +1,6 @@
 [Activity]
 name = FifteenPuzzle
-activity_version = 3
+activity_version = 1
 bundle_id = org.sugarlabs.FifteenPuzzle
 exec = sugar-activity3 activity.FifteenPuzzle
 icon = puzzle
